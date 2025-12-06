@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AromaGo - Luxury Perfume Vending Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --matte-black: #1a1a1a;
+            --deep-black: #0d0d0d;
+            --gold: #d4af37;
+            --gold-light: #f4e4bc;
+            --gold-dark: #b8941f;
+            --text-light: #f5f5f5;
+            --text-muted: #999;
+            --danger: #ff4444;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--matte-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- KEYFRAME ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 
+            0% { transform: translateY(0px); } 
+            50% { transform: translateY(-10px); } 
+            100% { transform: translateY(0px); } 
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px 50px;
+            border-bottom: 1px solid #333;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        .nav-actions button {
+            background: none;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-left: 10px;
+        }
+
+        .nav-actions button:hover {
+            background: var(--gold);
+            color: var(--deep-black);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1595867275464-963e634739eb?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+            animation: fadeIn 2s ease;
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 200;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            color: var(--gold-light);
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #ccc;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .cta-button {
+            background: var(--gold);
+            color: var(--deep-black);
+            padding: 15px 40px;
+            border: none;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .cta-button:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+        /* --- Products Section with Scroll Animation --- */
+        .products-section {
+            padding: 100px 50px;
+            background: var(--matte-black);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 200;
+            letter-spacing: 6px;
+            margin-bottom: 60px;
+            color: var(--gold);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: var(--deep-black);
+            border: 1px solid #222;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.4s ease;
+            opacity: 0; /* Hidden initially for scroll anim */
+            transform: translateY(50px);
+        }
+
+        /* Class added by JS when visible */
+        .product-card.visible {
+            animation: slideUp 0.8s forwards;
+        }
+
+        .product-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-10px) !important;
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 20px;
+            filter: grayscale(40%);
+            transition: 0.5s ease;
+        }
+
+        /* Floating effect on hover */
+        .product-card:hover .product-image { 
+            filter: grayscale(0%);
+            animation: float 3s ease-in-out infinite; 
+        }
+
+        .product-name {
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: var(--gold-light);
+            text-transform: uppercase;
+        }
+
+        .product-description {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            height: 40px;
+        }
+
+        .product-price {
+            font-size: 20px;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .add-to-cart {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .add-to-cart:hover {
+            background: var(--gold);
+            color: var(--deep-black);
+        }
+
+        /* --- MAP SECTION (False Map) --- */
+        .map-section {
+            padding: 100px 50px;
+            background: var(--deep-black);
+            text-align: center;
+        }
+
+        .map-container {
+            max-width: 1200px;
+            height: 500px;
+            margin: 0 auto;
+            background: #111 url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg') no-repeat center;
+            background-size: contain;
+            /* Invert map to be dark */
+            filter: invert(1) opacity(0.2); 
+            border: 1px solid var(--gold);
+            position: relative;
+            border-radius: 4px;
+        }
+
+        /* Map Pins */
+        .map-pin {
+            width: 15px;
+            height: 15px;
+            background: var(--gold);
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+        
+        .map-pin::after {
+            content: "ONLINE";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #000;
+            padding: 2px 5px;
+            font-size: 10px;
+            border-radius: 2px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .map-pin:hover::after { opacity: 1; }
+
+        /* --- ABOUT SECTION --- */
+        .about-section {
+            padding: 100px 50px;
+            background: linear-gradient(to bottom, var(--matte-black), var(--deep-black));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .about-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .about-text h2 {
+            color: var(--gold);
+            font-size: 36px;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+
+        .about-text p {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .about-image {
+            flex: 1;
+            max-width: 500px;
+            height: 400px;
+            background: url('https://images.unsplash.com/photo-1541533848490-bc9c30afc5d7?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            border: 1px solid var(--gold);
+            filter: grayscale(100%);
+            transition: 0.5s;
+        }
+
+        .about-image:hover { filter: grayscale(0%); }
+
+        /* --- CART SIDEBAR --- */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: var(--deep-black);
+            border-left: 1px solid var(--gold);
+            z-index: 2000;
+            transition: 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        }
+
+        .cart-sidebar.open { right: 0; }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .cart-header h2 { color: var(--gold); font-weight: 300; letter-spacing: 2px; }
+        .close-cart { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+
+        .cart-items { flex: 1; overflow-y: auto; }
+
+        .cart-item {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .cart-item img { width: 60px; height: 60px; object-fit: cover; margin-right: 15px; }
+        .cart-item-details { flex: 1; }
+        .cart-item-title { font-size: 14px; color: var(--gold-light); margin-bottom: 5px; }
+        .cart-item-price { font-size: 14px; color: #fff; }
+        .remove-item { color: var(--danger); background: none; border: none; font-size: 12px; cursor: pointer; margin-top: 5px; }
+
+        .cart-footer { border-top: 1px solid var(--gold); padding-top: 20px; }
+        .total-price { display: flex; justify-content: space-between; font-size: 20px; color: var(--gold); margin-bottom: 20px; }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--gold);
+            color: var(--deep-black);
+            border: none;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* --- MODALS (Device ID & Payment) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--deep-black);
+            border: 1px solid var(--gold);
+            padding: 40px;
+            width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-title { color: var(--gold); font-size: 24px; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+        .input-group { margin-bottom: 30px; }
+        .input-group label { display: block; color: #888; margin-bottom: 10px; font-size: 12px; letter-spacing: 1px; }
+        
+        .device-input {
+            width: 100%;
+            padding: 15px;
+            background: #111;
+            border: 1px solid #444;
+            color: var(--gold);
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .device-input:focus { outline: none; border-color: var(--gold); }
+        .spinner { border: 4px solid #333; border-top: 4px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- CHATBOT --- */
+        .aroma-advisor { position: fixed; bottom: 30px; right: 30px; z-index: 2500; }
+        .chatbot-toggle {
+            width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none;
+            cursor: pointer; font-size: 24px; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+            transition: 0.3s;
+        }
+        .chatbot-toggle:hover { transform: scale(1.1); }
+
+        .chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 450px;
+            background: #111;
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+
+        .chat-header {
+            background: var(--gold);
+            color: #000;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-msg {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .chat-msg.bot { background: #333; color: #ddd; align-self: flex-start; }
+        .chat-msg.user { background: var(--gold); color: #000; align-self: flex-end; }
+
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .chat-input-area button {
+            background: var(--gold);
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <div class="logo">AROMAGO</div>
+            <ul class="nav-links">
+                <li><a href="#products">COLLECTIONS</a></li>
+                <li><a href="#map">LOCATIONS</a></li>
+                <li><a href="#about">ABOUT</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button onclick="toggleCart()">CART (<span id="cart-count">0</span>)</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-image"></div>
+        <div class="hero-content">
+            <h1>AROMAGO</h1>
+            <p>Scent on Demand. Luxury Redefined.</p>
+            <a href="#products" class="cta-button">BROWSE SELECTION</a>
+        </div>
+    </section>
+
+    <section class="products-section" id="products">
+        <h2 class="section-title">THE COLLECTION</h2>
+        <div class="products-grid" id="products-grid"></div>
+    </section>
+
+    <section class="map-section" id="map">
+        <h2 class="section-title">GLOBAL VENDING NETWORK</h2>
+        <p style="color: #999; margin-bottom: 30px;">Locate your nearest AromaGo Smart Dispenser</p>
+        <div class="map-container">
+            <div class="map-pin" style="top: 30%; left: 20%;"></div>
+            <div class="map-pin" style="top: 45%; left: 22%;"></div> <div class="map-pin" style="top: 35%; left: 48%;"></div> <div class="map-pin" style="top: 38%; left: 51%;"></div> <div class="map-pin" style="top: 25%; left: 75%;"></div> <div class="map-pin" style="top: 60%; left: 80%;"></div> <div class="map-pin" style="top: 42%; left: 68%;"></div> <div class="map-pin" style="top: 70%; left: 30%;"></div> </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-text">
+            <h2>OUR STORY</h2>
+            <p>Founded in 2025, AromaGo bridge the gap between high-end perfumery and modern convenience. We believe that luxury shouldn't be gated behind department store counters.</p>
+            <p>Our network of proprietary "Smart Dispensers" maintain fragrances at the perfect molecular temperature, ensuring that every spray is as the perfumer intended.</p>
+            <p>Whether you need a quick refresh for an interview or a signature scent for a gala, AromaGo is your on-demand olfactory concierge.</p>
+        </div>
+        <div class="about-image"></div>
+    </section>
+
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2>YOUR SELECTION</h2>
+            <button class="close-cart" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <p style="text-align:center; color:#666; margin-top:50px;">Your cart is empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="total-price">
+                <span>TOTAL</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <button class="checkout-btn" onclick="openDeviceModal()">PROCEED TO VEND</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="device-modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Locate Machine</h3>
+            <p style="color: #999; margin-bottom: 20px; font-size: 14px;">To dispense your items, please enter the Device ID found on the screen of the AromaGo machine nearest to you.</p>
+            <div class="input-group">
+                <label>DEVICE ID NUMBER</label>
+                <input type="text" id="device-id-input" class="device-input" placeholder="AG-000" maxlength="6">
+            </div>
+            <button class="cta-button" onclick="verifyDevice()">CONNECT TO MACHINE</button>
+            <button onclick="closeModals()" style="display:block; margin: 20px auto 0; background:none; border:none; color:#666; cursor:pointer; text-decoration:underline;">Cancel</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal-content">
+            <div id="processing-view">
+                <h3 class="modal-title">Processing Payment</h3>
+                <div class="spinner"></div>
+                <p style="color: #999;">Securely connecting to bank...</p>
+            </div>
+            <div id="success-view" style="display: none;">
+                <div style="font-size: 60px; color: var(--gold); margin-bottom: 20px;">&#10003;</div>
+                <h3 class="modal-title">Payment Successful</h3>
+                <p style="color: #fff; margin-bottom: 20px;">Dispensing in progress...</p>
+                <div style="background: #111; padding: 15px; border: 1px dashed var(--gold); margin-bottom: 20px;">
+                    <p style="color: var(--gold);">MACHINE: <span id="confirmed-device"></span></p>
+                    <p style="color: #999; font-size: 12px;">Please collect your items from the bin.</p>
+                </div>
+                <button class="cta-button" onclick="finishOrder()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="aroma-advisor">
+        <button class="chatbot-toggle" onclick="toggleChat()" title="Ask Aroma Advisor">💬</button>
+        <div class="chat-window" id="chat-window">
+            <div class="chat-header">
+                <span>Aroma Advisor</span>
+                <span style="cursor:pointer" onclick="toggleChat()">&times;</span>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-msg bot">Hello! I am your scent stylist. Tell me where you are going (e.g., "Party", "Date", "Office") and I'll suggest a perfume.</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Type here..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const products = [
+            { id: 1, name: "Noir Elegance", desc: "Oud & Amber. Deep, woody, and mysterious.", price: 145, image: "https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=1000&auto=format&fit=crop" },
+            { id: 2, name: "Golden Hour", desc: "Saffron & Vanilla. Warm and inviting.", price: 165, image: "https://images.unsplash.com/photo-1616949755610-8c977112d210?q=80&w=1000&auto=format&fit=crop" },
+            { id: 3, name: "Midnight Bloom", desc: "Jasmine & Night Musk. Floral intensity.", price: 155, image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=1000&auto=format&fit=crop" },
+            { id: 4, name: "Urban Musk", desc: "Leather & Tobacco. Modern sophistication.", price: 135, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1000&auto=format&fit=crop" },
+            { id: 5, name: "Crystal Mist", desc: "Citrus & Sea Salt. Sharp and refreshing.", price: 125, image: "https://images.unsplash.com/photo-1585232561786-b7e1500750fb?q=80&w=1000&auto=format&fit=crop" },
+            { id: 6, name: "Royal Essence", desc: "Iris & Sandalwood. Powdery and regal.", price: 185, image: "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1000&auto=format&fit=crop" }
+        ];
+
+        let cart = [];
+
+        // --- INITIALIZATION ---
+        const grid = document.getElementById('products-grid');
+
+        function renderProducts() {
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image" style="background-image: url('${product.image}');"></div>
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-description">${product.desc}</p>
+                    <div class="product-price">$${product.price}</div>
+                    <button class="add-to-cart" onclick="addToCart(${product.id})">ADD TO CART</button>
+                </div>
+            `).join('');
+            
+            // Re-run observer after rendering
+            observeProducts();
+        }
+
+        renderProducts();
+
+        // --- SCROLL ANIMATION OBSERVER ---
+        function observeProducts() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        // --- CART LOGIC ---
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartUI();
+            toggleCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const countSpan = document.getElementById('cart-count');
+            const totalSpan = document.getElementById('cart-total');
+
+            countSpan.innerText = cart.length;
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#666; margin-top:50px;">Your cart is empty.</p>`;
+            } else {
+                container.innerHTML = cart.map((item, index) => {
+                    total += item.price;
+                    return `
+                        <div class="cart-item">
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="cart-item-details">
+                                <div class="cart-item-title">${item.name}</div>
+                                <div class="cart-item-price">$${item.price}</div>
+                                <button class="remove-item" onclick="removeFromCart(${index})">REMOVE</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            totalSpan.innerText = '$' + total.toFixed(2);
+        }
+
+        // --- CHECKOUT & MODAL LOGIC ---
+        function openDeviceModal() {
+            if (cart.length === 0) { alert("Please add items to your cart first."); return; }
+            toggleCart();
+            document.getElementById('device-modal').style.display = 'flex';
+        }
+
+        function closeModals() {
+            document.getElementById('device-modal').style.display = 'none';
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+
+        function verifyDevice() {
+            const deviceInput = document.getElementById('device-id-input').value;
+            if (deviceInput.length < 3) { alert("Please enter a valid Device ID (e.g. AG-05)"); return; }
+            document.getElementById('device-modal').style.display = 'none';
+            document.getElementById('payment-modal').style.display = 'flex';
+            document.getElementById('confirmed-device').innerText = deviceInput.toUpperCase();
+            
+            setTimeout(() => {
+                document.getElementById('processing-view').style.display = 'none';
+                document.getElementById('success-view').style.display = 'block';
+            }, 3000);
+        }
+
+        function finishOrder() {
+            cart = []; updateCartUI(); closeModals();
+            document.getElementById('processing-view').style.display = 'block';
+            document.getElementById('success-view').style.display = 'none';
+            document.getElementById('device-id-input').value = '';
+            alert("Thank you! Enjoy your scent.");
+        }
+
+        // --- CHATBOT LOGIC ---
+        function toggleChat() {
+            const chatWin = document.getElementById('chat-window');
+            if (chatWin.style.display === 'flex') {
+                chatWin.style.display = 'none';
+            } else {
+                chatWin.style.display = 'flex';
+            }
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const txt = input.value.trim();
+            if (!txt) return;
+
+            addMsg(txt, 'user');
+            input.value = '';
+
+            // Simulated AI Delay
+            setTimeout(() => {
+                let response = "That's a great choice. I recommend 'Noir Elegance' for its sophisticated profile.";
+                if(txt.toLowerCase().includes('party')) response = "For a party, you need projection. 'Midnight Bloom' or 'Urban Musk' are perfect.";
+                if(txt.toLowerCase().includes('date')) response = "For a date, try 'Golden Hour'. It's warm, inviting, and very alluring.";
+                if(txt.toLowerCase().includes('gym')) response = "For the gym, 'Crystal Mist' is best. It's light and non-offensive.";
+                
+                addMsg(response, 'bot');
+            }, 1000);
+        }
+
+        function addMsg(txt, type) {
+            const body = document.getElementById('chat-body');
+            const div = document.createElement('div');
+            div.className = `chat-msg ${type}`;
+            div.innerText = txt;
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
